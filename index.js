@@ -9,18 +9,16 @@ const PORT = 3000
 
 app.use(express.urlencoded({ extended : false })) // puts the form data into the body
 
+// making a log file
 app.use((req,res, next)=>{
 
-    console.log("hello from middleware one");
-    console.log(req);
-    // req[0].first_name = "shreyansh";
-    next();
-})
-app.use((req,res, next)=>{
-    // console.log(req);
+    fs.appendFile('./log.txt', `${Date.now()}: ${req.method} : ${req.path}\n` ,(err,data)=>{
+        return next();
+    })
+
     // next();
-    return res.json({status : "returned from middleware 2"})
-})
+}) 
+
 
 // end of middlewares
 
