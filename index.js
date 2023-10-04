@@ -1,12 +1,30 @@
 const express = require('express')
 const app = express()
 
-const PORT = 8000
+const users = require('./MOCK_DATA.json')
 
-app.listen(PORT, ()=>{
-    console.log("listening to port 8000"); 
-})
+const PORT = 3000
 
 // GET request API
+app.get("/users/api", ( req, res )=>{
+    return res.json(users);
+})
+
+app.get("/users", ( req, res )=>{
+    const html =    `
+    <ul>
+        ${ users.map( (user) => {
+            return `<li> ${user["first_name"]} </li>`
+        }).join("")}
+    </ul>
+    `
+
+    return res.send(html);
+})
+
+app.listen(PORT, ()=>{
+    console.log("listening to port 3000"); 
+})
+
 
 
