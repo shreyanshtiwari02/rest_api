@@ -2,7 +2,7 @@ const express = require('express')
 const app = express()
 const  fs = require('fs')
 const users = require('./MOCK_DATA.json')
-
+const httpProxy = require('http-proxy')
 const PORT = 3000
 
 // Middlewares
@@ -84,6 +84,4 @@ app
 app.listen(PORT, ()=>{
     console.log("listening to port 3000"); 
 })
-
-
 
