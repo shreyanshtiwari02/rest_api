@@ -1,9 +1,27 @@
 const express = require('express')
 const app = express()
-
+const  fs = require('fs')
 const users = require('./MOCK_DATA.json')
-
+const httpProxy = require('http-proxy')
 const PORT = 3000
+
+// Middlewares
+
+app.use(express.urlencoded({ extended : false })) // puts the form data into the body
+
+// making a log file
+app.use((req,res, next)=>{
+
+    fs.appendFile('./log.txt', `${Date.now()}: ${req.method} : ${req.path}\n` ,(err,data)=>{
+        return next();
+    })
+
+    // next();
+}) 
+
+
+// end of middlewares
+
 
 // GET request API
 app.get("/api/users", ( req, res )=>{
@@ -20,6 +38,15 @@ app.get("/users", ( req, res )=>{
     `
     return res.send(html);
 })
+.post( "/api/users", (req, res)=>{
+    // const id = Number( req.params.id );
+    const body = req.body ;
+    console.log(body); 
+    users.push({...body , id: users.length+1 });
+    fs.writeFile('./MOCK_DATA.json', JSON.stringify(users) , (err, data)=>{
+        return res.json({ status : "data is pushed successfully"});
+    });
+})
 
 // dynamic route for requests
 app
@@ -29,13 +56,23 @@ app
     console.log(id);
     return res.json(users[id-1]);
 })
-.post((req, res)=>{
-    const id = Number( req.params.id );
-    return res.json({ status : "pending"});
-})
 .patch((req, res)=>{
-    const id = Number( req.params.id );
-    return res.json({ status : "pending"});
+
+    const oldId = Number( req.params.id );
+    const body = req.body;
+    body.id= oldId;
+
+     users.forEach( (user,index) => {
+        if(user.id === oldId){
+            users[index] = body;
+            return;
+        }
+    } )
+
+    fs.writeFile('./MOCK_DATA.json', JSON.stringify(users) , (err, data)=>{
+        return res.json({ status : "data is updated successfully"});
+    });
+ 
 })
 .delete((req, res)=>{
     const id = Number( req.params.id );
@@ -47,6 +84,4 @@ app
 app.listen(PORT, ()=>{
     console.log("listening to port 3000"); 
 })
-
-
 
